@@ -13,6 +13,7 @@ import { OrdersListComponent } from './orders/orders-list/orders-list.component'
 import { HomeComponent } from './home/home.component';
 import { MaterialModule } from '@bba/material';
 import { RoutingModule } from './routing.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { RoutingModule } from './routing.module';
     BrowserAnimationsModule,
     MaterialModule,
     RoutingModule,
+    FormsModule,
     StoreModule.forRoot({}, {}),
   ],
   providers: [],

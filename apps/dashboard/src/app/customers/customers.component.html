@@ -1,1 +1,18 @@
-<p>customers works!</p>
+<div class="component-container">
+  <div class="list-component">
+    <bba-customers-list
+      [customers]="customers$ | async"
+      (selected)="selectCustomer($event)"
+      (deleted)="deleteCustomer($event)"
+    >
+    </bba-customers-list>
+  </div>
+  <div class="details-component">
+    <bba-customer-details
+      [customer]="selectedCustomer$ | async"
+      (saved)="saveCustomer($event)"
+      (cancelled)="resetForm()"
+    >
+    </bba-customer-details>
+  </div>
+</div>

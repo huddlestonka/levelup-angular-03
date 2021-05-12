@@ -1,1 +1,28 @@
-<p>customers-list works!</p>
+<mat-card>
+  <mat-card-title> Customers </mat-card-title>
+  <mat-card-content>
+    <mat-list data-cy="customers-list">
+      <mat-list-item
+        *ngFor="let customer of customers"
+        attr.data-cy="customer-{{ customer.id }}-item"
+        class="mat-list-option"
+        (click)="selected.emit(customer)"
+        data-cy="list-item"
+      >
+        <span matLine attr.data-cy="customer-{{ customer.id }}-item-title">
+          {{ customer.firstName }} {{ customer.lastName }}</span
+        >
+        <button
+          *ngIf="!readonly"
+          attr.data-cy="delete-customer-{{ customer.id }}-btn"
+          mat-icon-button
+          type="button"
+          color="warn"
+          (click)="deleted.emit(customer); $event.stopImmediatePropagation()"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>
