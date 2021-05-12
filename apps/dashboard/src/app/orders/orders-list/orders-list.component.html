@@ -1,1 +1,28 @@
-<p>orders-list works!</p>
+<mat-card>
+  <mat-card-title> Orders </mat-card-title>
+  <mat-card-content>
+    <mat-list data-cy="orders-list">
+      <mat-list-item
+        *ngFor="let order of orders"
+        attr.data-cy="order-{{ order.id }}-item"
+        class="mat-list-option"
+        (click)="selected.emit(order)"
+        data-cy="list-item"
+      >
+        <span matLine attr.data-cy="order-{{ order.id }}-item-title">
+          {{ order.title }}</span
+        >
+        <button
+          *ngIf="!readonly"
+          attr.data-cy="delete-order-{{ order.id }}-btn"
+          mat-icon-button
+          type="button"
+          color="warn"
+          (click)="deleted.emit(order); $event.stopImmediatePropagation()"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>

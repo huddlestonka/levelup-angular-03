@@ -70,9 +70,9 @@ export class CustomersFacade {
    * Combine pieces of state using createSelector,
    * and expose them as observables through the facade.
    */
-  loaded$ = this.store.pipe(select(CustomersSelectors.getCustomersLoaded));
-  allCustomers$ = this.store.pipe(select(CustomersSelectors.getAllCustomers));
-  selectedCustomers$ = this.store.pipe(select(CustomersSelectors.getSelected));
+  // loaded$ = this.store.pipe(select(CustomersSelectors.getCustomersLoaded));
+  // allCustomers$ = this.store.pipe(select(CustomersSelectors.getAllCustomers));
+  // selectedCustomers$ = this.store.pipe(select(CustomersSelectors.getSelected));
 
   constructor(private store: Store) {}
 

@@ -1,1 +1,19 @@
-<p>orders works!</p>
+<div class="component-container">
+  <div class="list-component">
+    <bba-orders-list
+      [orders]="orders$ | async"
+      (selected)="selectOrder($event)"
+      (deleted)="deleteOrder($event)"
+    >
+    </bba-orders-list>
+  </div>
+  <div class="details-component">
+    <bba-order-details
+      [order]="selectedOrder$ | async"
+      [customers]="customers$ | async"
+      (saved)="saveOrder($event)"
+      (cancelled)="resetForm()"
+    >
+    </bba-order-details>
+  </div>
+</div>

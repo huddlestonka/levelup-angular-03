@@ -1,1 +1,21 @@
-<p>home works!</p>
+<div class="home-container" data-cy="home-customer-cards">
+  <mat-card
+    *ngFor="let customer of customers$ | async"
+    attr.data-cy="home-customer-{{ customer.id }}-card"
+  >
+    <mat-card-header>
+      <mat-card-title attr.data-cy="home-customer-{{ customer.id }}-title">
+        {{ customer.firstName }} {{ customer.lastName }}
+      </mat-card-title>
+      <mat-card-subtitle>{{ customer.title }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <bba-orders-list
+        attr.data-cy="home-customer-{{ customer.id }}-orders"
+        [orders]="customer.orders"
+        [readonly]="true"
+      >
+      </bba-orders-list>
+    </mat-card-content>
+  </mat-card>
+</div>
