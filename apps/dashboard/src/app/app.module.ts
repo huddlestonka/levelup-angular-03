@@ -11,10 +11,27 @@ import { OrdersComponent } from './orders/orders.component';
 import { OrderDetailsComponent } from './orders/order-details/order-details.component';
 import { OrdersListComponent } from './orders/orders-list/orders-list.component';
 import { HomeComponent } from './home/home.component';
+import { MaterialModule } from '@bba/material';
+import { RoutingModule } from './routing.module';
 
 @NgModule({
-  declarations: [AppComponent, CustomersComponent, CustomerDetailsComponent, CustomersListComponent, OrdersComponent, OrderDetailsComponent, OrdersListComponent, HomeComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, StoreModule.forRoot({}, {})],
+  declarations: [
+    AppComponent,
+    CustomersComponent,
+    CustomerDetailsComponent,
+    CustomersListComponent,
+    OrdersComponent,
+    OrderDetailsComponent,
+    OrdersListComponent,
+    HomeComponent,
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    MaterialModule,
+    RoutingModule,
+    StoreModule.forRoot({}, {}),
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
