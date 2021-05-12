@@ -5,12 +5,17 @@ import { CustomersFacade, OrdersFacade } from '@bba/core-state';
   selector: 'bba-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  providers: [CustomersFacade],
 })
 export class HomeComponent implements OnInit {
-  customers$ = this.customersFacade.currentCustomers$;
+  customerOrders$ = this.customersFacade.customerOrders$;
 
-  constructor(private customersFacade: CustomersFacade) {}
+  constructor(
+    private customersFacade: CustomersFacade,
+    private ordersFacade: OrdersFacade
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.customersFacade.loadCustomers();
+    this.ordersFacade.loadOrders();
+  }
 }

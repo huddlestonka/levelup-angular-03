@@ -1,6 +1,6 @@
 <div class="home-container" data-cy="home-customer-cards">
   <mat-card
-    *ngFor="let customer of customers$ | async"
+    *ngFor="let customer of customerOrders$ | async"
     attr.data-cy="home-customer-{{ customer.id }}-card"
   >
     <mat-card-header>
@@ -9,7 +9,7 @@
       </mat-card-title>
       <mat-card-subtitle>{{ customer.title }}</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content>
+    <mat-card-content *ngIf="customer.orders?.length; else noOrders">
       <bba-orders-list
         attr.data-cy="home-customer-{{ customer.id }}-orders"
         [orders]="customer.orders"
@@ -17,5 +17,6 @@
       >
       </bba-orders-list>
     </mat-card-content>
+    <ng-template #noOrders> No Orders </ng-template>
   </mat-card>
 </div>

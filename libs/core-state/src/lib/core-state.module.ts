@@ -1,25 +1,32 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StoreModule } from '@ngrx/store';
+import { NgModule } from '@angular/core';
 import { EffectsModule } from '@ngrx/effects';
-import * as fromCustomers from './customers/customers.reducer';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { RootStoreConfig, StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+import { reducers } from '.';
+
 import { CustomersEffects } from './customers/customers.effects';
-import { CustomersFacade } from './customers/customers.facade';
-import * as fromOrders from './orders/orders.reducer';
 import { OrdersEffects } from './orders/orders.effects';
-import { OrdersFacade } from './orders/orders.facade';
+
+const STORE_NAME = 'bba-store';
+const storeConfig: RootStoreConfig<any> = {
+  runtimeChecks: {
+    strictActionImmutability: true,
+    strictActionSerializability: true,
+    strictStateImmutability: true,
+    strictStateSerializability: true,
+  },
+};
 
 @NgModule({
   imports: [
     CommonModule,
-    StoreModule.forFeature(
-      fromCustomers.CUSTOMERS_FEATURE_KEY,
-      fromCustomers.reducer
-    ),
-    EffectsModule.forFeature([CustomersEffects]),
-    StoreModule.forFeature(fromOrders.ORDERS_FEATURE_KEY, fromOrders.reducer),
-    EffectsModule.forFeature([OrdersEffects]),
+    StoreModule.forRoot(reducers, storeConfig),
+    EffectsModule.forRoot([CustomersEffects, OrdersEffects]),
+    StoreDevtoolsModule.instrument({ maxAge: 25, name: STORE_NAME }),
+    StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
   ],
-  providers: [CustomersFacade, OrdersFacade],
 })
 export class CoreStateModule {}

@@ -1,93 +1,63 @@
 import { Injectable } from '@angular/core';
-
-import { select, Store, Action } from '@ngrx/store';
-
-import * as OrdersActions from './orders.actions';
-import * as OrdersFeature from './orders.reducer';
-import * as OrdersSelectors from './orders.selectors';
 import { Order } from '@bba/api-interfaces';
-import { BehaviorSubject } from 'rxjs';
+import { Action, ActionsSubject, select, Store } from '@ngrx/store';
+import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
+import * as OrdersActions from './orders.actions';
+import * as fromOrders from './orders.reducer';
+import * as OrdersSelectors from './orders.selectors';
 
-const orders: Order[] = [
-  {
-    id: '56789f40-b0fb-4aa6-4e88-376b4edfm8he',
-    title: 'Gift Basket',
-    description: 'THE TURTLES!',
-    customerId: '56789f40-b0fb-4aa6-8e88-376b4edfm8he',
-  },
-  {
-    id: '567898j0-b0fb-4aa6-4e88-376b4e0lk8he',
-    title: 'Best Boss Mug',
-    description: "World's Best Boss",
-    customerId: '56789f40-b0fb-4aa6-8e88-376b4edfm8he',
-  },
-  {
-    id: '56783440-b0fb-4aa6-4e88-376b4edfm8he',
-    title: 'Large Pepperoni',
-    description: 'Extra sauce',
-    customerId: '57789f40-b8hb-4336-8e88-376b4ed765he',
-  },
-  {
-    id: '56229f40-b33b-4aa6-4e88-376b4elkj8he',
-    title: 'Garlic Breadsticks',
-    description: 'Extra garlic :)',
-    customerId: '57789f40-b8hb-4aa6-8e88-376b4ed765he',
-  },
-];
-
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class OrdersFacade {
-  private ordersSubject: BehaviorSubject<Order[]> = new BehaviorSubject(orders);
-  currentOrders$ = this.ordersSubject.asObservable();
-  private selectedOrderSubject: BehaviorSubject<Order> = new BehaviorSubject(
-    null
-  );
-  selectedOrder$ = this.selectedOrderSubject.asObservable();
-  /**
-   * Combine pieces of state using createSelector,
-   * and expose them as observables through the facade.
-   */
   loaded$ = this.store.pipe(select(OrdersSelectors.getOrdersLoaded));
   allOrders$ = this.store.pipe(select(OrdersSelectors.getAllOrders));
-  selectedOrders$ = this.store.pipe(select(OrdersSelectors.getSelected));
+  selectedOrder$ = this.store.pipe(select(OrdersSelectors.getSelectedOrder));
 
-  constructor(private store: Store) {}
+  mutations$ = this.actions$.pipe(
+    filter(
+      (action: Action) =>
+        action.type === OrdersActions.createOrder({} as any).type ||
+        action.type === OrdersActions.updateOrder({} as any).type ||
+        action.type === OrdersActions.deleteOrder({} as any).type
+    )
+  );
 
-  /**
-   * Use the initialization action to perform one
-   * or more tasks in your Effects.
-   */
-  init() {
-    this.store.dispatch(OrdersActions.init());
+  constructor(
+    private store: Store<fromOrders.OrdersPartialState>,
+    private actions$: ActionsSubject
+  ) {}
+
+  selectOrder(selectedId: string) {
+    this.dispatch(OrdersActions.selectOrder({ selectedId }));
   }
 
-  selectOrder(selectedOrder: Order) {
-    this.selectedOrderSubject.next(selectedOrder);
+  loadOrders() {
+    this.dispatch(OrdersActions.loadOrders());
+  }
+
+  loadOrder(orderId: string) {
+    this.dispatch(OrdersActions.loadOrder({ orderId }));
   }
 
   createOrder(order: Order) {
-    const orders: Order[] = this.ordersSubject.value;
-    const newOrder = Object.assign({}, order, { id: uuidv4() });
-    const updatedOrders: Order[] = [...orders, newOrder];
-    this.update(updatedOrders);
+    this.dispatch(
+      OrdersActions.createOrder({
+        order: Object.assign({}, order, { id: uuidv4() }),
+      })
+    );
   }
 
   updateOrder(order: Order) {
-    const orders: Order[] = this.ordersSubject.value;
-    const updatedOrders: Order[] = orders.map((u) => {
-      return u.id === order.id ? Object.assign({}, order) : u;
-    });
-    this.update(updatedOrders);
+    this.dispatch(OrdersActions.updateOrder({ order }));
   }
 
   deleteOrder(order: Order) {
-    const orders: Order[] = this.ordersSubject.value;
-    const updatedOrders: Order[] = orders.filter((c) => c.id !== order.id);
-    this.update(updatedOrders);
+    this.dispatch(OrdersActions.deleteOrder({ order }));
   }
 
-  update(orders: Order[]) {
-    this.ordersSubject.next(orders);
+  dispatch(action: Action) {
+    this.store.dispatch(action);
   }
 }

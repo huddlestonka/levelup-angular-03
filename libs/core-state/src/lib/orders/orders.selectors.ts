@@ -1,13 +1,13 @@
+import { Order } from '@bba/api-interfaces';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
   ORDERS_FEATURE_KEY,
-  State,
-  OrdersPartialState,
+  OrdersState,
   ordersAdapter,
 } from './orders.reducer';
 
 // Lookup the 'Orders' feature state managed by NgRx
-export const getOrdersState = createFeatureSelector<OrdersPartialState, State>(
+export const getOrdersState = createFeatureSelector<OrdersState>(
   ORDERS_FEATURE_KEY
 );
 
@@ -15,30 +15,40 @@ const { selectAll, selectEntities } = ordersAdapter.getSelectors();
 
 export const getOrdersLoaded = createSelector(
   getOrdersState,
-  (state: State) => state.loaded
+  (state: OrdersState) => state.loaded
 );
 
 export const getOrdersError = createSelector(
   getOrdersState,
-  (state: State) => state.error
+  (state: OrdersState) => state.error
 );
 
-export const getAllOrders = createSelector(getOrdersState, (state: State) =>
-  selectAll(state)
+export const getAllOrders = createSelector(
+  getOrdersState,
+  (state: OrdersState) => selectAll(state)
 );
 
 export const getOrdersEntities = createSelector(
   getOrdersState,
-  (state: State) => selectEntities(state)
+  (state: OrdersState) => selectEntities(state)
 );
 
-export const getSelectedId = createSelector(
+export const getSelectedOrderId = createSelector(
   getOrdersState,
-  (state: State) => state.selectedId
+  (state: OrdersState) => state.selectedId
 );
 
-export const getSelected = createSelector(
+export const getSelectedOrder = createSelector(
   getOrdersEntities,
-  getSelectedId,
-  (entities, selectedId) => selectedId && entities[selectedId]
+  getSelectedOrderId,
+  (entities, selectedId) => {
+    const emptyOrder: Order = {
+      id: '',
+      title: '',
+      description: '',
+      customerId: '',
+    };
+
+    return selectedId ? entities[selectedId] : emptyOrder;
+  }
 );

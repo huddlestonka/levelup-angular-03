@@ -7,23 +7,34 @@ import { CustomersFacade } from '@bba/core-state';
   selector: 'bba-customers',
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.scss'],
-  providers: [CustomersFacade],
 })
 export class CustomersComponent implements OnInit {
-  customers$: Observable<Customer[]> = this.customersFacade.currentCustomers$;
+  customers$: Observable<Customer[]> = this.customersFacade.allCustomers$;
   selectedCustomer$: Observable<Customer> = this.customersFacade
     .selectedCustomer$;
 
   constructor(private customersFacade: CustomersFacade) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadCustomers();
+    this.customersFacade.mutations$.subscribe((_) => this.reset());
+  }
+
+  reset() {
+    this.loadCustomers();
+    this.customersFacade.selectCustomer(null);
+  }
 
   resetForm() {
     this.customersFacade.selectCustomer(null);
   }
 
+  loadCustomers() {
+    this.customersFacade.loadCustomers();
+  }
+
   selectCustomer(customer: Customer) {
-    this.customersFacade.selectCustomer(customer);
+    this.customersFacade.selectCustomer(customer.id);
   }
 
   saveCustomer(customer: Customer) {
