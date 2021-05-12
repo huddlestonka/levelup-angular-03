@@ -1,15 +1,18 @@
-import { OrdersEntity } from './orders.models';
-import { State, ordersAdapter, initialState } from './orders.reducer';
+import {
+  OrdersState,
+  ordersAdapter,
+  initialOrdersState,
+} from './orders.reducer';
 import * as OrdersSelectors from './orders.selectors';
+
+import { Order } from '@bba/api-interfaces';
+import { mockOrder } from '@bba/testing';
 
 describe('Orders Selectors', () => {
   const ERROR_MSG = 'No Error Available';
   const getOrdersId = (it) => it['id'];
-  const createOrdersEntity = (id: string, name = '') =>
-    ({
-      id,
-      name: name || `name-${id}`,
-    } as OrdersEntity);
+  const createOrder = (id: string, name = '') =>
+    ({ ...mockOrder, id: id } as Order);
 
   let state;
 
@@ -17,12 +20,12 @@ describe('Orders Selectors', () => {
     state = {
       orders: ordersAdapter.setAll(
         [
-          createOrdersEntity('PRODUCT-AAA'),
-          createOrdersEntity('PRODUCT-BBB'),
-          createOrdersEntity('PRODUCT-CCC'),
+          createOrder('PRODUCT-AAA'),
+          createOrder('PRODUCT-BBB'),
+          createOrder('PRODUCT-CCC'),
         ],
         {
-          ...initialState,
+          ...initialOrdersState,
           selectedId: 'PRODUCT-BBB',
           error: ERROR_MSG,
           loaded: true,
@@ -41,7 +44,7 @@ describe('Orders Selectors', () => {
     });
 
     it('getSelected() should return the selected Entity', () => {
-      const result = OrdersSelectors.getSelected(state);
+      const result = OrdersSelectors.getSelectedOrder(state);
       const selId = getOrdersId(result);
 
       expect(selId).toBe('PRODUCT-BBB');

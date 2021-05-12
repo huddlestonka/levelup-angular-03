@@ -1,118 +1,106 @@
-import { NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { readFirst } from '@nrwl/angular/testing';
+import { ActionsSubject } from '@ngrx/store';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule, Store } from '@ngrx/store';
-
-import { NxModule } from '@nrwl/angular';
-
-import { OrdersEntity } from './orders.models';
-import { OrdersEffects } from './orders.effects';
 import { OrdersFacade } from './orders.facade';
-
-import * as OrdersSelectors from './orders.selectors';
 import * as OrdersActions from './orders.actions';
-import {
-  ORDERS_FEATURE_KEY,
-  State,
-  initialState,
-  reducer,
-} from './orders.reducer';
+import { initialOrdersState } from './orders.reducer';
 
-interface TestSchema {
-  orders: State;
-}
+import { mockOrder } from '@bba/testing';
 
 describe('OrdersFacade', () => {
   let facade: OrdersFacade;
-  let store: Store<TestSchema>;
-  const createOrdersEntity = (id: string, name = '') =>
-    ({
-      id,
-      name: name || `name-${id}`,
-    } as OrdersEntity);
+  let actionSubject;
+  const mockActionsSubject = new ActionsSubject();
+  let store: MockStore;
 
-  beforeEach(() => {});
-
-  describe('used in NgModule', () => {
-    beforeEach(() => {
-      @NgModule({
-        imports: [
-          StoreModule.forFeature(ORDERS_FEATURE_KEY, reducer),
-          EffectsModule.forFeature([OrdersEffects]),
-        ],
-        providers: [OrdersFacade],
-      })
-      class CustomFeatureModule {}
-
-      @NgModule({
-        imports: [
-          NxModule.forRoot(),
-          StoreModule.forRoot({}),
-          EffectsModule.forRoot([]),
-          CustomFeatureModule,
-        ],
-      })
-      class RootModule {}
-      TestBed.configureTestingModule({ imports: [RootModule] });
-
-      store = TestBed.inject(Store);
-      facade = TestBed.inject(OrdersFacade);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        OrdersFacade,
+        provideMockStore({ initialState: initialOrdersState }),
+        { provide: ActionsSubject, useValue: mockActionsSubject },
+      ],
     });
 
-    /**
-     * The initially generated facade::loadAll() returns empty array
-     */
-    it('loadAll() should return empty list with loaded == true', async (done) => {
-      try {
-        let list = await readFirst(facade.allOrders$);
-        let isLoaded = await readFirst(facade.loaded$);
+    facade = TestBed.inject(OrdersFacade);
+    actionSubject = TestBed.inject(ActionsSubject);
+    store = TestBed.inject(MockStore);
+  });
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(false);
+  it('should be created', () => {
+    expect(facade).toBeTruthy();
+  });
 
-        facade.init();
+  it('should have mutations', (done) => {
+    const action = OrdersActions.createOrder({ order: mockOrder });
+    actionSubject.next(action);
 
-        list = await readFirst(facade.allOrders$);
-        isLoaded = await readFirst(facade.loaded$);
+    facade.mutations$.subscribe((result) => {
+      expect(result).toBe(action);
+      done();
+    });
+  });
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(true);
+  describe('should dispatch', () => {
+    it('select on select(order.id)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        done();
-      } catch (err) {
-        done.fail(err);
-      }
+      facade.selectOrder(mockOrder.id);
+
+      const action = OrdersActions.selectOrder({ selectedId: mockOrder.id });
+
+      expect(spy).toHaveBeenCalledWith(action);
     });
 
-    /**
-     * Use `loadOrdersSuccess` to manually update list
-     */
-    it('allOrders$ should return the loaded list; and loaded flag == true', async (done) => {
-      try {
-        let list = await readFirst(facade.allOrders$);
-        let isLoaded = await readFirst(facade.loaded$);
+    it('loadOrders on loadOrders()', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(false);
+      facade.loadOrders();
 
-        store.dispatch(
-          OrdersActions.loadOrdersSuccess({
-            orders: [createOrdersEntity('AAA'), createOrdersEntity('BBB')],
-          })
-        );
+      const action = OrdersActions.loadOrders();
 
-        list = await readFirst(facade.allOrders$);
-        isLoaded = await readFirst(facade.loaded$);
+      expect(spy).toHaveBeenCalledWith(action);
+    });
 
-        expect(list.length).toBe(2);
-        expect(isLoaded).toBe(true);
+    it('loadOrder on loadOrder(order.id)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        done();
-      } catch (err) {
-        done.fail(err);
-      }
+      facade.loadOrder(mockOrder.id);
+
+      const action = OrdersActions.loadOrder({ orderId: mockOrder.id });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('createOrder on createOrder(order)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.createOrder(mockOrder);
+
+      const action = OrdersActions.createOrder({ order: mockOrder });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('updateOrder on updateOrder(order)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.updateOrder(mockOrder);
+
+      const action = OrdersActions.updateOrder({ order: mockOrder });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('delete on delete(model)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.deleteOrder(mockOrder);
+
+      const action = OrdersActions.deleteOrder({ order: mockOrder });
+
+      expect(spy).toHaveBeenCalledWith(action);
     });
   });
 });

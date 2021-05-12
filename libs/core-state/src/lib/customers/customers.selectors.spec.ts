@@ -1,15 +1,18 @@
-import { CustomersEntity } from './customers.models';
-import { State, customersAdapter, initialState } from './customers.reducer';
+import {
+  CustomersState,
+  customersAdapter,
+  initialCustomersState,
+} from './customers.reducer';
 import * as CustomersSelectors from './customers.selectors';
+
+import { Customer } from '@bba/api-interfaces';
+import { mockCustomer } from '@bba/testing';
 
 describe('Customers Selectors', () => {
   const ERROR_MSG = 'No Error Available';
   const getCustomersId = (it) => it['id'];
-  const createCustomersEntity = (id: string, name = '') =>
-    ({
-      id,
-      name: name || `name-${id}`,
-    } as CustomersEntity);
+  const createCustomer = (id: string, name = '') =>
+    ({ ...mockCustomer, id: id } as Customer);
 
   let state;
 
@@ -17,12 +20,12 @@ describe('Customers Selectors', () => {
     state = {
       customers: customersAdapter.setAll(
         [
-          createCustomersEntity('PRODUCT-AAA'),
-          createCustomersEntity('PRODUCT-BBB'),
-          createCustomersEntity('PRODUCT-CCC'),
+          createCustomer('PRODUCT-AAA'),
+          createCustomer('PRODUCT-BBB'),
+          createCustomer('PRODUCT-CCC'),
         ],
         {
-          ...initialState,
+          ...initialCustomersState,
           selectedId: 'PRODUCT-BBB',
           error: ERROR_MSG,
           loaded: true,
@@ -41,7 +44,7 @@ describe('Customers Selectors', () => {
     });
 
     it('getSelected() should return the selected Entity', () => {
-      const result = CustomersSelectors.getSelected(state);
+      const result = CustomersSelectors.getSelectedCustomer(state);
       const selId = getCustomersId(result);
 
       expect(selId).toBe('PRODUCT-BBB');

@@ -1,121 +1,116 @@
-import { NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { readFirst } from '@nrwl/angular/testing';
+import { ActionsSubject } from '@ngrx/store';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule, Store } from '@ngrx/store';
-
-import { NxModule } from '@nrwl/angular';
-
-import { CustomersEntity } from './customers.models';
-import { CustomersEffects } from './customers.effects';
 import { CustomersFacade } from './customers.facade';
-
-import * as CustomersSelectors from './customers.selectors';
 import * as CustomersActions from './customers.actions';
-import {
-  CUSTOMERS_FEATURE_KEY,
-  State,
-  initialState,
-  reducer,
-} from './customers.reducer';
+import { initialCustomersState } from './customers.reducer';
 
-interface TestSchema {
-  customers: State;
-}
+import { mockCustomer } from '@bba/testing';
 
 describe('CustomersFacade', () => {
   let facade: CustomersFacade;
-  let store: Store<TestSchema>;
-  const createCustomersEntity = (id: string, name = '') =>
-    ({
-      id,
-      name: name || `name-${id}`,
-    } as CustomersEntity);
+  let actionSubject;
+  const mockActionsSubject = new ActionsSubject();
+  let store: MockStore;
 
-  beforeEach(() => {});
-
-  describe('used in NgModule', () => {
-    beforeEach(() => {
-      @NgModule({
-        imports: [
-          StoreModule.forFeature(CUSTOMERS_FEATURE_KEY, reducer),
-          EffectsModule.forFeature([CustomersEffects]),
-        ],
-        providers: [CustomersFacade],
-      })
-      class CustomFeatureModule {}
-
-      @NgModule({
-        imports: [
-          NxModule.forRoot(),
-          StoreModule.forRoot({}),
-          EffectsModule.forRoot([]),
-          CustomFeatureModule,
-        ],
-      })
-      class RootModule {}
-      TestBed.configureTestingModule({ imports: [RootModule] });
-
-      store = TestBed.inject(Store);
-      facade = TestBed.inject(CustomersFacade);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        CustomersFacade,
+        provideMockStore({ initialState: initialCustomersState }),
+        { provide: ActionsSubject, useValue: mockActionsSubject },
+      ],
     });
 
-    /**
-     * The initially generated facade::loadAll() returns empty array
-     */
-    it('loadAll() should return empty list with loaded == true', async (done) => {
-      try {
-        let list = await readFirst(facade.allCustomers$);
-        let isLoaded = await readFirst(facade.loaded$);
+    facade = TestBed.inject(CustomersFacade);
+    actionSubject = TestBed.inject(ActionsSubject);
+    store = TestBed.inject(MockStore);
+  });
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(false);
+  it('should be created', () => {
+    expect(facade).toBeTruthy();
+  });
 
-        facade.init();
+  it('should have mutations', (done) => {
+    const action = CustomersActions.createCustomer({ customer: mockCustomer });
+    actionSubject.next(action);
 
-        list = await readFirst(facade.allCustomers$);
-        isLoaded = await readFirst(facade.loaded$);
+    facade.mutations$.subscribe((result) => {
+      expect(result).toBe(action);
+      done();
+    });
+  });
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(true);
+  describe('should dispatch', () => {
+    it('select on select(customer.id)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        done();
-      } catch (err) {
-        done.fail(err);
-      }
+      facade.selectCustomer(mockCustomer.id);
+
+      const action = CustomersActions.selectCustomer({
+        selectedId: mockCustomer.id,
+      });
+
+      expect(spy).toHaveBeenCalledWith(action);
     });
 
-    /**
-     * Use `loadCustomersSuccess` to manually update list
-     */
-    it('allCustomers$ should return the loaded list; and loaded flag == true', async (done) => {
-      try {
-        let list = await readFirst(facade.allCustomers$);
-        let isLoaded = await readFirst(facade.loaded$);
+    it('loadCustomers on loadCustomers()', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        expect(list.length).toBe(0);
-        expect(isLoaded).toBe(false);
+      facade.loadCustomers();
 
-        store.dispatch(
-          CustomersActions.loadCustomersSuccess({
-            customers: [
-              createCustomersEntity('AAA'),
-              createCustomersEntity('BBB'),
-            ],
-          })
-        );
+      const action = CustomersActions.loadCustomers();
 
-        list = await readFirst(facade.allCustomers$);
-        isLoaded = await readFirst(facade.loaded$);
+      expect(spy).toHaveBeenCalledWith(action);
+    });
 
-        expect(list.length).toBe(2);
-        expect(isLoaded).toBe(true);
+    it('loadCustomer on loadCustomer(customer.id)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
 
-        done();
-      } catch (err) {
-        done.fail(err);
-      }
+      facade.loadCustomer(mockCustomer.id);
+
+      const action = CustomersActions.loadCustomer({
+        customerId: mockCustomer.id,
+      });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('createCustomer on createCustomer(customer)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.createCustomer(mockCustomer);
+
+      const action = CustomersActions.createCustomer({
+        customer: mockCustomer,
+      });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('updateCustomer on updateCustomer(customer)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.updateCustomer(mockCustomer);
+
+      const action = CustomersActions.updateCustomer({
+        customer: mockCustomer,
+      });
+
+      expect(spy).toHaveBeenCalledWith(action);
+    });
+
+    it('delete on delete(model)', () => {
+      const spy = jest.spyOn(store, 'dispatch');
+
+      facade.deleteCustomer(mockCustomer);
+
+      const action = CustomersActions.deleteCustomer({
+        customer: mockCustomer,
+      });
+
+      expect(spy).toHaveBeenCalledWith(action);
     });
   });
 });
