@@ -37,6 +37,9 @@
     },
     "api-interfaces": {
       "tags": []
+    },
+    "testing": {
+      "tags": []
     }
   }
 }

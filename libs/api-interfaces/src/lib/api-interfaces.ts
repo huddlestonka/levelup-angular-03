@@ -15,5 +15,5 @@ export interface Customer extends BaseEntity {
 export interface Order extends BaseEntity {
   title: string;
   description: string;
-  customerId: any;
+  customerId: string;
 }
