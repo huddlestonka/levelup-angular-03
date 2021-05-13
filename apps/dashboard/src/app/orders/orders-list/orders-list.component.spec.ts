@@ -1,17 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from '@bba/material';
 import { OrdersListComponent } from './orders-list.component';
 
 describe('OrdersListComponent', () => {
   let component: OrdersListComponent;
   let fixture: ComponentFixture<OrdersListComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ OrdersListComponent ]
-    })
-    .compileComponents();
-  });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [OrdersListComponent],
+      imports: [MaterialModule, NoopAnimationsModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(OrdersListComponent);

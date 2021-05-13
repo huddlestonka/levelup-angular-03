@@ -1,31 +1,37 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { Component, DebugElement } from '@angular/core';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent, SidenavStatus } from './app.component';
+import { MaterialModule } from '@bba/material';
+import { RouterTestingModule } from '@angular/router/testing';
+import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+  let de: DebugElement;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
       declarations: [AppComponent],
+      imports: [
+        HttpClientModule,
+        MaterialModule,
+        RouterTestingModule,
+        NoopAnimationsModule,
+      ],
     }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    de = fixture.debugElement;
+    fixture.detectChanges();
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'dashboard'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('dashboard');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain(
-      'Welcome to dashboard!'
-    );
+    expect(component).toBeTruthy();
   });
 });
