@@ -7,7 +7,7 @@ This project was generated using [Nx](https://nx.dev).
 ## App Description
 
 This is the 3rd of 8 Accelerated Angular LevelUp Applications.
-It aims to show a more complex feature set/data model for a fully reactive, well architected Angular application.
+It aims to show a more complex feature set/data model for a fully reactive, unit tested, well architected Angular application.
 
 Specifically, this dashboard app features CRUD functionality on two entities - Customers...
 
@@ -45,6 +45,10 @@ and Orders...
 
 and assign orders to any customer you like.
 The home page shows all customers with their assigned orders.
+
+## See It Live
+
+[Visit Customer Dashboard](https://levelup-angular-03-customers.surge.sh/)
 
 ## Getting Started
 
